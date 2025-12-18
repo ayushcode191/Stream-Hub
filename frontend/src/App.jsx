@@ -1,39 +1,104 @@
-import React from 'react'
-import { Route, Routes } from 'react-router';
+import {Navigate, Route, Routes } from 'react-router';
 import HomePage from './pages/HomePage.jsx';
-import Onboarding from './pages/Onboarding.jsx';
+import OnboardingPage from './pages/OnboardingPage.jsx';
 import ChatPage from './pages/ChatPage.jsx';
 import CallPage from './pages/CallPage.jsx';
-import NotificationPage from './pages/NotificationPage.jsx';
+import NotificationsPage from './pages/NotificationsPage.jsx';
 import LoginPage from './pages/LoginPage.jsx';
 import SignUpPage from './pages/SignUpPage.jsx';
 
-import {Toaster} from "react-hot-toast";
-import { useQuery } from '@tanstack/react-query';
-import { axiosInstance } from './lib/axios.js';
+import toast, {Toaster} from "react-hot-toast";
+import PageLoader from "./components/PageLoader.jsx";
+import useAuthUser from "./hooks/useAuthUser.js";
+import Layout from "./components/Layout.jsx";
+import { useThemeStore } from "./store/useThemeStore.js";
 
 const App = () => {
-  // tanstack Query
-  const {data, isLoading, error, } = useQuery({queryKey:["todos"],
+  const {isLoading, authUser} = useAuthUser();
+  const {theme} = useThemeStore();
 
-    queryFn: async() => {
-      const res = await axiosInstance.get("/auth/me");
-      return res.data;
-    },
-    retry: false, //auth check
-  })
-  console.log(data);
+  const isAuthenticated = Boolean(authUser);
+  const isOnboarded = authUser?.isOnboarded;
+
+  if(isLoading) return <PageLoader/>;
+
   return (
-    <div className="h-screen" data-theme="night">
-      
+    <div className="h-screen" data-theme={theme}>
       <Routes>
-        <Route path='/' element={<HomePage/>}/>
-        <Route path='/signup' element={<SignUpPage/>}/>
-        <Route path='/login' element={<LoginPage/>}/>
-        <Route path='/notification' element={<NotificationPage/>}/>
-        <Route path='/call' element={<CallPage/>}/>
-        <Route path='/chat' element={<ChatPage/>}/>
-        <Route path='/onboarding' element={<Onboarding/>}/>
+        <Route
+          path="/"
+          element={
+            isAuthenticated && isOnboarded ? (
+              <Layout showSidebar={true}>
+                <HomePage />
+              </Layout>
+            ) : (
+              <Navigate to={!isAuthenticated ? "/login" : "/onboarding"} />
+            )
+          }
+        />
+        <Route
+          path="/signup"
+          element={
+            !isAuthenticated ? <SignUpPage /> : <Navigate to={isOnboarded ? "/" : "/onboarding"} />
+          }
+        />
+        <Route
+          path="/login"
+          element={
+            !isAuthenticated ? <LoginPage /> : <Navigate to={isOnboarded ? "/" : "/onboarding"} />
+          }
+        />
+        <Route
+          path="/notifications"
+          element={
+            isAuthenticated && isOnboarded ? (
+              <Layout showSidebar={true}>
+                <NotificationsPage />
+              </Layout>
+            ) : (
+              <Navigate to={!isAuthenticated ? "/login" : "/onboarding"} />
+            )
+          }
+        />
+        <Route
+          path="/call/:id"
+          element={
+            isAuthenticated && isOnboarded ? (
+              <CallPage />
+            ) : (
+              <Navigate to={!isAuthenticated ? "/login" : "/onboarding"} />
+            )
+          }
+        />
+
+        <Route
+          path="/chat/:id"
+          element={
+            isAuthenticated && isOnboarded ? (
+              <Layout showSidebar={false}>
+                <ChatPage />
+              </Layout>
+            ) : (
+              <Navigate to={!isAuthenticated ? "/login" : "/onboarding"} />
+            )
+          }
+        />
+
+        <Route
+          path="/onboarding"
+          element={
+            isAuthenticated ? (
+              !isOnboarded ? (
+                <OnboardingPage />
+              ) : (
+                <Navigate to="/" />
+              )
+            ) : (
+              <Navigate to="/login" />
+            )
+          }
+        />
       </Routes>
 
       <Toaster/>
@@ -41,4 +106,4 @@ const App = () => {
   )
 };
 
-export default App
+export default App;

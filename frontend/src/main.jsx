@@ -20,4 +20,4 @@ createRoot(document.getElementById('root')).render(
     </QueryClientProvider>
     </BrowserRouter>
   </StrictMode>,
-)
+);
