@@ -48,6 +48,7 @@ const userSchema = new mongoose.Schema({
         }
     ]
 }, {timestamps:true});
+
 userSchema.pre("save", async function (next) {
 
     if(!this.isModified("password")){
@@ -61,7 +62,6 @@ userSchema.pre("save", async function (next) {
     } catch(error){
         next(error);
     }
-    
 })
 
 userSchema.methods.matchPassword = async function (enteredPassword) {
