@@ -14,7 +14,7 @@ export async function getRecommendedUsers(req, res) {
                 {isOnboarded: true}
             ]
         })
-        res.status(200).json({ecommendedUsers})
+        res.status(200).json({recommendedUsers});
     } catch (error) {
         console.log("Error in getRecommendedUsers controller",error.message);
         res.status(500).json({message: "Internal Server Error"});
@@ -34,7 +34,7 @@ export async function getMyFriends(req,res) {
     }
 }
 
-export async function sendFriendRequest(re, res) {
+export async function sendFriendRequest(req, res) {
     try {
         const myId = req.user.id;
         const { id: recipientId} = req.params;
@@ -144,5 +144,4 @@ export async function getOutgoingFriendReqs(req, res) {
         console.log("Error in getOutgoingFriendReqs controller", error.message);
         res.status(500).json({message: "Internal Server Error"});
     }
-    
 }
