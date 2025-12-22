@@ -56,7 +56,7 @@ const Sidebar = () => {
         <div className="flex items-center gap-3">
           <div className="avatar">
             <div className="w-10 rounded-full">
-              <img src={authUser?.profilePic} alt="User Avatar" />
+              <img src={authUser?.profilePic || "/default-avatar.png"} alt="User Avatar" />
             </div>
           </div>
           <div className="flex-1">
