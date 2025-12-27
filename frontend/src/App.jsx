@@ -10,6 +10,7 @@ import toast, { Toaster } from 'react-hot-toast';
 import { Navigate } from 'react-router';
 import PageLoader from './components/PageLoader.jsx';
 import useAuthUser from './hooks/useAuthUser.js';
+import Layout from './components/Layout.jsx';
 
 const App = () => {
   const {isLoading, authUser} = useAuthUser();
@@ -20,11 +21,14 @@ const App = () => {
   if(isLoading) return <PageLoader/>
 
   return (
-    <div className='h-screen ' data-theme = "coffee">
+    <div className='h-screen ' data-theme = "forest">
       <button onClick={() => toast.error("Hello World!")}>Create a toast</button>
       <Routes>
         <Route path="/" element={isAuthenticated && isOnboarded ? (
-          <HomePage />
+          <Layout showSidebar = {true}>
+            <HomePage />
+          </Layout>
+          
         ) : (
           <Navigate to = {!isAuthenticated ? "/login" : "/onboarding"} />
         )}/>
@@ -46,7 +50,21 @@ const App = () => {
         <Route path='/notifications' element={isAuthenticated ? <NotificationsPage/> : <Navigate to="/login" />}/>
         <Route path='/call' element={isAuthenticated ? <CallPage/> : <Navigate to="/login" />}/>
         <Route path='/chat' element={isAuthenticated ? <ChatPage/> : <Navigate to="/login" />}/>
-        <Route path='/onboarding' element={isAuthenticated ? <OnboardingPage/> : <Navigate to="/login" />}/>
+        
+        <Route
+          path="/onboarding"
+          element={
+            isAuthenticated ? (
+              !isOnboarded ? (
+                <OnboardingPage />
+              ) : (
+                <Navigate to="/" />
+              )
+            ) : (
+              <Navigate to="/login" />
+            )
+          }
+        />
       </Routes>
 
       <Toaster/>
